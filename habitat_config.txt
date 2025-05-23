@@ -1,0 +1,91 @@
+# habitat_configs/pointnav_mp3d.yaml
+# Habitat configuration for MP3D PointNav training
+
+ENVIRONMENT:
+  MAX_EPISODE_STEPS: 500
+  ITERATOR_OPTIONS:
+    CYCLE: True
+    SHUFFLE: True
+    GROUP_BY_SCENE: True
+    NUM_EPISODE_SAMPLE: -1
+    MAX_SCENE_REPEAT_EPISODES: -1
+    MAX_SCENE_REPEAT_STEPS: 10000
+    STEP_REPETITION_RANGE: 0.2
+
+SIMULATOR:
+  TYPE: Habitat-Sim
+  ACTION_SPACE_CONFIG: v0
+  FORWARD_STEP_SIZE: 0.25
+  SCENE_DATASET: mp3d
+  ADDITIONAL_OBJECT_PATHS: []
+  
+  RGB_SENSOR:
+    TYPE: HabitatSimRGBSensor
+    HEIGHT: 224
+    WIDTH: 224
+    POSITION: [0, 1.25, 0]
+    ORIENTATION: [0, 0, 0]
+    HFOV: 79
+    SENSOR_SUBTYPE: PINHOLE
+    
+  DEPTH_SENSOR:
+    TYPE: HabitatSimDepthSensor
+    HEIGHT: 224
+    WIDTH: 224
+    POSITION: [0, 1.25, 0]
+    ORIENTATION: [0, 0, 0]
+    HFOV: 79
+    MIN_DEPTH: 0.0
+    MAX_DEPTH: 10.0
+    NORMALIZE_DEPTH: True
+    SENSOR_SUBTYPE: PINHOLE
+    
+  SEMANTIC_SENSOR:
+    TYPE: HabitatSimSemanticSensor
+    HEIGHT: 224
+    WIDTH: 224
+    POSITION: [0, 1.25, 0]
+    ORIENTATION: [0, 0, 0]
+    HFOV: 79
+    SENSOR_SUBTYPE: PINHOLE
+
+  AGENT_0:
+    HEIGHT: 1.5
+    RADIUS: 0.1
+    SENSORS: [RGB_SENSOR, DEPTH_SENSOR, SEMANTIC_SENSOR]
+    IS_SET_START_STATE: False
+    START_POSITION: [0, 0, 0]
+    START_ROTATION: [0, 0, 0, 1]
+
+  HABITAT_SIM_V0:
+    ALLOW_SLIDING: True
+    ENABLE_PHYSICS: False
+    GPU_DEVICE_ID: 0
+    GPU_GPU: False
+    PHYSICS_CONFIG_FILE: ./data/default.physics_config.json
+
+TASK:
+  TYPE: Nav-v0
+  SUCCESS_DISTANCE: 0.2
+  SENSORS: [POINTGOAL_WITH_GPS_COMPASS_SENSOR]
+  POINTGOAL_WITH_GPS_COMPASS_SENSOR:
+    TYPE: PointGoalWithGPSCompassSensor
+    GOAL_FORMAT: POLAR
+    DIMENSIONALITY: 2
+  GOAL_SENSOR_UUID: pointgoal_with_gps_compass
+  MEASUREMENTS: [DISTANCE_TO_GOAL, SUCCESS, SPL, SOFT_SPL]
+  DISTANCE_TO_GOAL:
+    TYPE: DistanceToGoal
+  SUCCESS:
+    TYPE: Success
+    SUCCESS_DISTANCE: 0.2
+  SPL:
+    TYPE: SPL
+  SOFT_SPL:
+    TYPE: SoftSPL
+
+DATASET:
+  TYPE: PointNav-v1
+  SPLIT: train
+  DATA_PATH: data/datasets/pointnav/mp3d/v1/{split}/{split}.json.gz
+  SCENES_DIR: data/scene_datasets/mp3d/

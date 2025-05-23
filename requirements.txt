@@ -1,0 +1,12 @@
+# Core
+torch>=2.2.0
+torchvision>=0.18.0
+# Magma-8B relies on a custom Transformers branch with chat-template support
+git+https://github.com/jwyang/transformers.git@v4.48.2-magma
+open-clip-torch>=2.23.0
+pillow>=10.3.0
+
+# Optional (handy in Colab)
+tqdm>=4.66.4
+accelerate>=0.29.3
+safetensors>=0.4.3
